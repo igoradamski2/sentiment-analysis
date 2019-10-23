@@ -1,4 +1,4 @@
-import utilities as DataLoader
+from utilities import DataLoader
 
 def loadReviews(file_dir):
     
@@ -12,7 +12,7 @@ def loadReviews(file_dir):
 
 if __name__ == "__main__":
     # Load data - assumes structure NEG and POS
-    file_dir = "/homes/ija23/nlp/data-tagged"
+    
 
 
 
