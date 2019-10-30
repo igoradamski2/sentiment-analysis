@@ -57,11 +57,12 @@ class NBModel:
                         freq = model['{}_occr'.format(cl)][features]
                     except:
                         freq = eps
+                        #continue
 
                     total = model['{}_tot'.format(cl)]
                     sizeV = len(model['{}_occr'.format(cl)])
                     
-                    calc  = np.log((freq + smoothing)/(total + sizeV * smoothing))
+                    calc  = np.log(freq + smoothing) - np.log(total + sizeV * smoothing)
 
                     prob += vocab[features]*calc
 

@@ -46,10 +46,13 @@ if __name__ == "__main__":
     model      = NBModel.trainNB(x_train, y_train, 4)
 
     print("testing")
-    predictions, prod_probs = NBModel.predictNB(x_test, y_test, model)
+    predictions, prod_probs = NBModel.predictNB(x_test, y_test, model, smoothing = 0, eps = 0.01)
+    predictions_sm, prod_probs_sm = NBModel.predictNB(x_test, y_test, model, smoothing = 1, eps = 0)
 
     accuracy = Metrics.getAccuracy(predictions, y_test)
+    accuracy_sm = Metrics.getAccuracy(predictions_sm, y_test)
 
-    print(accuracy)
+
+    print('Accuracy is {}. \nSmoothed accuracy is {}'.format(accuracy, accuracy_sm))
 
 
