@@ -52,14 +52,24 @@ class Vocabulary:
         return wordDict
 
     @staticmethod
-    def getVocabularyByDocument(document):
-        full_vocab = Vocabulary.getUnigramsByDocument(document)
-        full_vocab.update(Vocabulary.getBigramsByDocument(document))
+    def getVocabularyByDocument(document, grams):
+
+        if 'uni' in grams:
+            full_vocab = Vocabulary.getUnigramsByDocument(document)
+        else:
+            full_vocab = {}
+
+        if 'bi' in grams:
+            full_vocab2 = Vocabulary.getBigramsByDocument(document)
+        else:
+            full_vocab2 = {}
+        
+        full_vocab.update(full_vocab2)
 
         return full_vocab
 
     @staticmethod
-    def getFullDict(document_set, vocabulary):
+    def getFullDict(document_set, vocabulary, grams):
 
         # We will go through the documents and 
         # get dictonaries for each. Then we will
@@ -70,7 +80,7 @@ class Vocabulary:
         
         for document in document_set:
             # Get vocab for that document
-            doc_vocab = Vocabulary.getVocabularyByDocument(document)
+            doc_vocab = Vocabulary.getVocabularyByDocument(document, grams)
 
             for words in doc_vocab.keys():
 
