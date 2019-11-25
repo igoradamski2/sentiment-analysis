@@ -119,15 +119,26 @@ class DataHandler:
 
     # This class takes a directory path and returns whole data as object
 
-    def __init__(self, file_dir):
-        pos_train        = DataLoader.getAllFiles(file_dir + "/POS")
-        neg_train        = DataLoader.getAllFiles(file_dir + "/NEG")
+    def __init__(self, file_dir = ''):
+        self.file_dir = file_dir 
+
+    def __call__(self, x_data, y_data):
+        self.x_data = x_data
+        self.y_data = y_data
+
+    def readOurData(self):
+        pos_train        = DataLoader.getAllFiles(self.file_dir + "/POS")
+        neg_train        = DataLoader.getAllFiles(self.file_dir + "/NEG")
 
         x_train, y_train = DataHandler.mergeClasses(pos_train, neg_train)
         x_train          = DataLoader.splitLinesNLTK(x_train)
 
-        self.x_data = x_train
-        self.y_data = y_train
+        self(x_data, y_data)
+
+    def readStanfordData(self):
+        data = DataLoader.getStanfordFiles(file_dir_stanford)
+        self(DataLoader.splitLinesNLTK(data), [])
+
 
     def blind_test(self):
 

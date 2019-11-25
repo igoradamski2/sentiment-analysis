@@ -16,18 +16,20 @@ file_dir_stanford = "/Users/igoradamski/Documents/cambridge/MLMI/nlp/coursework/
 file_dir_our      = "/Users/igoradamski/Documents/cambridge/MLMI/nlp/coursework/nlp/data"
 
 # Load the data 
-stanford_data = DataLoader.getStanfordFiles(file_dir_stanford)
-our_data      = DataHandler(file_dir_our)
+stanford_data = DataHandler.readStanfordData(file_dir_stanford)
+our_data      = DataHandler.readOurData(file_dir_our)
 
 # Process the data
-stanford_data = DataLoader.splitLinesNLTK(stanford_data)
-stanford_data = [StanfordDocument(words, [1]) for words in stanford_data]
+stanford_data = [StanfordDocument(words, [1]) for words in stanford_data.x_data]
 
 train, test   = our_data.blind_test()
 
+cv_train      = DataHandler()
+cv_train(train.x_train, train.y_train)
+
 # Train models ===============================================================
 cores     = multiprocessing.cpu_count()
-svm_model = MySVM(gamma=0.01, kernel = 'rbf')
+#svm_model = MySVM(gamma=0.01, kernel = 'rbf')
 
 for dm in [0, 1]:
 
@@ -52,11 +54,15 @@ for dm in [0, 1]:
                     doc2vec_model.save("model_dm={},hs={},min_count={},vector_size={},window={}".format(dm,hs,min_count,vector_size,window))
 
                     # Now evaluate on our data
-                    train_set = DataHandler.applyDoc2Vec(train.x_train, doc2vec_model.model)
-                    test_set  = DataHandler.applyDoc2Vec(test.x_train, doc2vec_model.model)
+                    vector_data = DataHandler()
+                    vector_data(DataHandler.applyDoc2Vec(cv_train.x_data, doc2vec_model.model))
+                    vector_data.roundRobinSplit(10)
 
-                    svm_model.train(train_set, test_set)
-                    predictions = svm_model.predict(test_set)
+                    svm_model.train(vector_data.x_data, vector_data.y_data)
+                    predictions = svm_model.predict(DataHandler.applyDoc2Vec(test.x_train, doc2vec_model.model))
+
+                    cv_accuracies   = np.mean(np.array(roundRobinCV(data, 10, MySVM, gamma=0.002, kernel = 'rbf')))
+                    test_accuracies = Metrics.getAccuracy(predictions, test.y_train)
                     with open('optimisation_results.txt', 'a+') as f:
                         my_str = "model_dm={},hs={},min_count={},vector_size={},window={}".format(dm,hs,min_count,vector_size,window)
                         my_str += " accuracy = {}".format(Metrics.getAccuracy(predictions, test.y_train))
