@@ -52,7 +52,7 @@ class Metrics:
 
 
     @staticmethod
-    def roundRobinCV(data, N, model, model_params):
+    def roundRobinCV(data, N, model, **model_params):
 
         accuracies  = []
 
@@ -72,9 +72,9 @@ class Metrics:
                     x_test += data.rrsplit[j].x_train
                     y_test += data.rrsplit[j].y_train
 
-            trained_model  = model(*model_params)
+            trained_model  = model(**model_params)
             trained_model.train(x_train, y_train)
-            predictions, _ = trained_model.predict(x_test)
+            predictions = trained_model.predict(x_test)
             
             accuracies.append(Metrics.getAccuracy(predictions, y_test))
 

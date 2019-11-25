@@ -100,7 +100,7 @@ class NBModel:
             predictions.append(max(probs, key=probs.get))
             prod_probs.append(probs)
 
-        return predictions, prod_probs
+        return predictions
 
 
     @staticmethod
@@ -189,9 +189,9 @@ class MyDoc2Vec:
         fname = get_tmpfile(name)
         self.model.save(fname)
 
-    def load(name):
+    def load(self, name):
         name = get_tmpfile(name)
-        return Doc2Vec.load(name)
+        self.model = Doc2Vec.load(name)
 
 class MySVM:
 

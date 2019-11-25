@@ -29,7 +29,7 @@ cv_train(train.x_train, train.y_train)
 
 # Train models ===============================================================
 cores     = multiprocessing.cpu_count()
-#svm_model = MySVM(gamma=0.01, kernel = 'rbf')
+svm_model = MySVM(gamma=0.01, kernel = 'rbf')
 
 for dm in [0, 1]:
 
@@ -55,7 +55,7 @@ for dm in [0, 1]:
 
                     # Now evaluate on our data
                     vector_data = DataHandler()
-                    vector_data(DataHandler.applyDoc2Vec(cv_train.x_data, doc2vec_model.model))
+                    vector_data(DataHandler.applyDoc2Vec(cv_train.x_data, doc2vec_model.model), cv_train.y_data)
                     vector_data.roundRobinSplit(10)
 
                     svm_model.train(vector_data.x_data, vector_data.y_data)

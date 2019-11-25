@@ -133,7 +133,7 @@ class DataHandler:
         x_train, y_train = DataHandler.mergeClasses(pos_train, neg_train)
         x_train          = DataLoader.splitLinesNLTK(x_train)
 
-        self(x_data, y_data)
+        self(x_train, y_train)
 
     def readStanfordData(self):
         data = DataLoader.getStanfordFiles(file_dir_stanford)
