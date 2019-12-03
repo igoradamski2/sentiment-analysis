@@ -3,18 +3,16 @@ import numpy as np
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from gensim.test.utils import get_tmpfile
 from sklearn import svm
-
+from tqdm import tqdm
 
 
 class NBModel:
 
-    def __init__(self, x_train, y_train, threshold, grams = ['uni', 'bi'], smoothing = False):
-        self.x_train   = x_train
-        self.y_train   = y_train
+    def __init__(self, threshold, grams = ['uni', 'bi'], smoothing = False):
+
         self.threshold = threshold
         self.grams     = grams
         self.smoothing = smoothing
-        #self.model     = NBModel.trainNB(x_train, y_train, threshold, grams = ['uni', 'bi'])
 
     def train(self, x_train, y_train):
 
@@ -64,6 +62,7 @@ class NBModel:
             probs['{}_Pc'.format(cl)]   = Pc if cl == 1 else 1 - Pc
 
         self.model = probs
+        self.y_train = y_train
 
     def predict(self, x_test):
 
@@ -205,6 +204,66 @@ class MySVM:
         return self.model.predict(x_test)
 
                 
+class BoW2Vec:
+
+    def __init__(self, threshold, grams = ['uni', 'bi']):
+        self.threshold = threshold
+        self.grams = grams
+
+    def getFullVocab(self, data):
+
+        if 'uni' in self.grams:
+            unigrams = Vocabulary.getUniGrams(data.x_data)
+        else:
+            unigrams = set()
+
+        if 'bi' in self.grams:
+            bigrams = Vocabulary.getBiGrams(data.x_data)
+        else:
+            bigrams = set()
+
+        allgrams = unigrams | bigrams
+
+        assert len(unigrams) + len(bigrams) == len(allgrams)
+
+        # Now reduce the vocabulary size
+        counts = Vocabulary.getFullDict(data.x_data, allgrams, self.grams)
+        counts = {k: val for k,val in counts.items() if NBModel.thr_condition(k,\
+                                                                              val,\
+                                                                              unigrams,\
+                                                                              bigrams,\
+                                                                              self.threshold)}
+
+
+        self.vocabulary = counts.keys()
+
+
+    def text2vec(self, train_data):
+
+        idx_vocab = {word:idx for idx, word in enumerate(self.vocabulary)}
+
+        documents = []
+        for document in tqdm(train_data.x_data):
+
+            doc_vocab = Vocabulary.getVocabularyByDocument(document, self.grams)
+            occurrences = np.zeros(len(idx_vocab.keys()))
+
+            for feature in doc_vocab.keys():
+
+                try:
+                    occurrences[idx_vocab[feature]] += doc_vocab[feature]
+                except:
+                    continue
+
+            documents.append(occurrences)
+
+        return documents
+
+
+                
+        
+
+
 
 
 

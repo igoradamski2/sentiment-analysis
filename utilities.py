@@ -82,7 +82,7 @@ class DataLoader:
         tknzr = TweetTokenizer()
         for review in tqdm(all_files):
             curr_words = tknzr.tokenize(review)
-            words.append(curr_words)
+            words.append([words.lower() for words in curr_words])
 
         return words
 
@@ -136,7 +136,7 @@ class DataHandler:
         self(x_train, y_train)
 
     def readStanfordData(self):
-        data = DataLoader.getStanfordFiles(file_dir_stanford)
+        data = DataLoader.getStanfordFiles(self.file_dir)
         self(DataLoader.splitLinesNLTK(data), [])
 
 
