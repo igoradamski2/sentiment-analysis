@@ -3,6 +3,7 @@ import math as mt
 from utilities import *
 from model import *
 from tqdm import tqdm
+from scipy.sparse import csr_matrix as sparse
 
 
 class Metrics:
@@ -17,6 +18,27 @@ class Metrics:
                 accr += 1 
 
         return accr/len(predictions)
+
+
+    @staticmethod
+    def permutationTest(predictions1, predictions2, R):
+
+        # Get initial difference in means
+        M0 = np.abs(np.mean(np.array(predictions1)) - np.mean(np.array(predictions2)))
+        s  = 0
+
+        for trial in range(R):
+
+            permute = np.random.choice([0,1], len(predictions1))
+            curr_vec1 = [predictions2[idx] if val == 1 else predictions1[idx] for idx,val in enumerate(permute)]
+            curr_vec2 = [predictions1[idx] if val == 1 else predictions2[idx] for idx,val in enumerate(permute)]
+
+            M = np.abs(np.mean(np.array(curr_vec1)) - np.mean(np.array(curr_vec2)))
+
+            if M > M0:
+                s += 1
+
+        return (s+1)/(R+1)
 
 
     @staticmethod
@@ -73,7 +95,12 @@ class Metrics:
                     y_test += data.rrsplit[j].y_train
 
             trained_model  = model(**model_params)
-            trained_model.train(x_train, y_train)
+            if data.sparse:
+                x_train = sparse(x_train)
+                trained_model.train(x_train, y_train)
+            else:
+                trained_model.train(x_train, y_train)
+                
             predictions = trained_model.predict(x_test)
             
             accuracies.append(Metrics.getAccuracy(predictions, y_test))

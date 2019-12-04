@@ -1,7 +1,7 @@
 import os
 import re
 import numpy as np
-from nltk.tokenize import TweetTokenizer
+from nltk.tokenize import TweetTokenizer, RegexpTokenizer
 from tqdm import tqdm
 
 class DataLoader:
@@ -11,7 +11,12 @@ class DataLoader:
         for r, d, f in os.walk(file_dir):
             for file in f:
                 fileList.append(os.path.join(file_dir, file))
-            
+        
+        numbered  = [re.search("\\/cv\d\d\d\_",x).group(0) for x in fileList]
+        numbered  = [re.findall(r'\d+', str) for str in numbered]
+        numbered  = [int(x[0]) for x in numbered]
+
+        fileList = [fileList[i] for i in numbered]           
         return fileList
 
     @staticmethod
@@ -79,7 +84,8 @@ class DataLoader:
     def splitLinesNLTK(all_files):
         # First get rid of empty lines
         words = []
-        tknzr = TweetTokenizer()
+        #tknzr = TweetTokenizer()
+        tknzr = RegexpTokenizer(r'\w+')
         for review in tqdm(all_files):
             curr_words = tknzr.tokenize(review)
             words.append([words.lower() for words in curr_words])
@@ -118,6 +124,7 @@ class DataLoader:
 class DataHandler:
 
     # This class takes a directory path and returns whole data as object
+    sparse = False
 
     def __init__(self, file_dir = ''):
         self.file_dir = file_dir 
@@ -192,7 +199,7 @@ class DataHandler:
     def getIndicesForRR(num_of_files, N):
         splits = []
         for i in range(N):
-            splits.append([i + N*k for k in range(((-(-num_of_files//N)))-1)])
+            splits.append([i + N*k for k in range(((-(-num_of_files//N))))])
         
         return splits
 

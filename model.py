@@ -192,6 +192,9 @@ class MyDoc2Vec:
         name = get_tmpfile(name)
         self.model = Doc2Vec.load(name)
 
+    def load_from_file(self, name):
+        self.model = Doc2Vec.load(name)
+
 class MySVM:
 
     def __init__(self, **model_params):
@@ -209,6 +212,7 @@ class BoW2Vec:
     def __init__(self, threshold, grams = ['uni', 'bi']):
         self.threshold = threshold
         self.grams = grams
+
 
     def getFullVocab(self, data):
 
