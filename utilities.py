@@ -252,3 +252,6 @@ class StanfordDocument:
     def __init__(self, words, tags):
         self.words = words
         self.tags = tags
+
+
+

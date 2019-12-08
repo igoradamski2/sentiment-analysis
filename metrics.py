@@ -21,21 +21,24 @@ class Metrics:
 
 
     @staticmethod
-    def permutationTest(predictions1, predictions2, R):
+    def permutationTest(predictions1, predictions2, actual, R):
+
+        scores1 = np.array([int(predictions1[i] == actual[i]) for i in range(len(actual))])
+        scores2 = np.array([int(predictions2[i] == actual[i]) for i in range(len(actual))])
 
         # Get initial difference in means
-        M0 = np.abs(np.mean(np.array(predictions1)) - np.mean(np.array(predictions2)))
+        M0 = np.abs(np.mean(np.array(scores1)) - np.mean(np.array(scores2)))
         s  = 0
 
         for trial in range(R):
 
-            permute = np.random.choice([0,1], len(predictions1))
-            curr_vec1 = [predictions2[idx] if val == 1 else predictions1[idx] for idx,val in enumerate(permute)]
-            curr_vec2 = [predictions1[idx] if val == 1 else predictions2[idx] for idx,val in enumerate(permute)]
+            permute = np.random.choice([0,1], len(scores1))
+            curr_vec1 = [scores2[idx] if val == 1 else scores1[idx] for idx,val in enumerate(permute)]
+            curr_vec2 = [scores1[idx] if val == 1 else scores2[idx] for idx,val in enumerate(permute)]
 
             M = np.abs(np.mean(np.array(curr_vec1)) - np.mean(np.array(curr_vec2)))
 
-            if M > M0:
+            if M >= M0:
                 s += 1
 
         return (s+1)/(R+1)
